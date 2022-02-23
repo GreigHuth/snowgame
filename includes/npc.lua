@@ -1,0 +1,1 @@
+--all the logic for npc's, this basically includes all non player interactable objects
