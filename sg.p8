@@ -1,5 +1,5 @@
 pico-8 cartridge // http://www.pico-8.com
-version 33
+version 34
 __lua__
 --Made By Gurg
 -- i want it to be made clear that i never said i was actually good at programming
@@ -39,7 +39,7 @@ function _init()
 
     --globals
     game_over = false
-    debug_on = false
+    debug_on = true
     grid_x = 0
     grid_y = 0 --current grid position
     map_tile = 0
@@ -95,12 +95,12 @@ function debug()
     local c = get_camera_pos()
 
     dmesg = {} --need to reinitialise every frame
-    add(dmesg, player.states.photo)
-    add(dmesg, abs(player.dy))
-    add(dmesg, player.x..","..player.y)
-    add(dmesg, player.s_target)
-    add(dmesg, "pos: "..grid_x..","..grid_y)
-    add(dmesg, "camerapos:"..c[0]..","..c[1])
+    --add(dmesg, player.states.photo)
+    --add(dmesg, abs(player.dy))
+    --add(dmesg, player.x..","..player.y)
+    --add(dmesg, player.s_target)
+    --add(dmesg, "pos: "..grid_x..","..grid_y)
+    --add(dmesg, "camerapos:"..c[0]..","..c[1])
 
     local line = 0
     for mesg in all(dmesg) do

@@ -1,18 +1,17 @@
 --code for the scanning tool
 
 collectables = {
-    ---          line 1                       line 2
-    ---     |                             |                              |             
+    ---                                                                                     | max length             
     [001] = "test",
-    [033] = "the ship you arrived on, it   landed after you ejected",
-    [034] = "your ship deployed these      save points before you crashed",
-    [069] = "the door is sealed. it is     decorated with the blue mineral",
-    [071] = "the wall of the cave drips    with gooey green gunk",
-    [074] = "the wall of the cave drips    with gooey green gunk",
-    [076] = "the blue has completely       absorbed the moss of the cave",
-    [102] = "mysterious blue mineral, it   has a hauntingly steady glow",
-    [066] = "the blue has weakened this    rock",
-    [114] = "the blue has seeped into the  rock and consumed it",
+    [033] = "the ship you arrived on, it landed after you ejected",
+    [034] = "your ship deployed these save points before you crashed",
+    [069] = "the door is sealed. it is decorated with the blue mineral",
+    [071] = "the cavern wall drips with gooey green gunk.",
+    [074] = "the cavern wall drips with gooey green gunk.",
+    [076] = "the blue has completely absorbed the moss of the cave",
+    [102] = "mysterious blue mineral, it has a hauntingly steady glow",
+    [066] = "the blue has weakened this rock",
+    [114] = "the blue has seeped into the rock and consumed it",
     [092] = "this contraption is extracting the blue ore. its loud"
  }
 
@@ -30,6 +29,23 @@ scan_rect = {
     },
 }
 
+--struct to control printing stuff
+p_control = {
+    
+    spr = 0, --sprite we get the text from
+    pos = 0, --position in the string
+    
+    anim = {
+        s = 0, -- keep track of timing
+        t = 10 -- how often we update 
+    },
+
+    pline = 0
+    
+    
+}
+
+
 function scan_rect:scan()
     for i=self.x, self.x+15, 1 do
         for j=self.y, self.y+15, 1 do
@@ -45,37 +61,53 @@ function scan_rect:scan()
 end
 
 
+--works backwards from index and returns the postion of the closest space to the index
+--returns the index if there is a space and -1 otherwise
+function find_space(start, stop, text)
+
+
+    while stop > start do
+
+        if sub(text, stop, stop) ==  " " then 
+            return stop
+        end
+
+        stop -= 1
+
+    end
+    
+    return -1
+end
+
 --prints dialogue and item descriptions to the screen
-function print_desc(text)
+function print_desc(spr)
 
-    xoff = 2
-    yoff = 110
+    text = collectables[spr]
 
-    max_chars = 31
+    xoff = 1
+    yoff = 100
+
+    max_chars = 30
 
     last_space = 0 --position of last space in string
 
     p_line = 0 --print line
 
     --draw outline
-    rect(camera_pos.x+xoff-1, camera_pos.y+yoff-1-1, camera_pos.x+xoff+(max_chars*4)+1, camera_pos.y+yoff+15+1, 8)
-    rectfill(camera_pos.x+xoff, camera_pos.y+yoff-1, camera_pos.x+xoff+(max_chars*4), camera_pos.y+yoff+15, 0)
+    
+    rectfill(camera_pos.x+xoff, camera_pos.y+yoff, camera_pos.x+xoff+(31*4)+2, camera_pos.y+yoff+((6*3)+3), 0)
+    rect(camera_pos.x+xoff, camera_pos.y+yoff, camera_pos.x+xoff+(31*4)+2, camera_pos.y+yoff+(6*3)+3, 8)
 
-    --display text
-    local i = 1
-    while i < #text+1 do 
+    last_space = find_space(0, 31, text)
+    last_space2 = find_space(32, 60, text)
 
-        if i == max_chars and p_line == 0 then
-            p_line = 1
-        end
+    local x = camera_pos.x+xoff+2
+    local y = camera_pos.y+yoff+2
 
-        local x = camera_pos.x+xoff-3+(i*4)-(120*p_line)
-        local y = camera_pos.y+yoff+(6*p_line)
+    print(sub(text, 0, last_space), x, y, 7)
+    print(sub(text, last_space+1, last_space2), x, y+6, 7)
+    --print(sub(text, last_space2+1, 80), x, y+12, 7)
 
-        print(sub(text, i,i), x, y, 7)
-      
-        i += 1
-    end
 end
 
 
@@ -105,8 +137,7 @@ function scan_rect:draw()
         
         if player.s_target  != -1 then
             spr(103, self.x, self.y-8) --draw "!" if target is scannable
-            local text = collectables[player.s_target]
-            print_desc(text)
+            print_desc(player.s_target)
         end
 
         if self.scanline.yoff == 15 then
@@ -131,4 +162,5 @@ function scan_rect:update()
 
     self.scanline.x = self.x 
     self.scanline.y = self.y
+
 end
