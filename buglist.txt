@@ -1,0 +1,2 @@
+print function doesnt display last word if text doesnt use up all three lines
+--the function that finds the space doesnt care if the text will fit or not

@@ -9,9 +9,10 @@ __lua__
 -- 1,23
 
 --GLOBAL TABLES
-flags = {
+flag = {
+    FOREGROUND = 0,
     SOLID = 1,
-    DAMAGE = 2
+    SCANNABLE = 6
 }
 
     
@@ -97,8 +98,6 @@ function debug()
     dmesg = {} --need to reinitialise every frame
 
     local los = check_los()
-
-    add(dmesg, los)
 
     --add(dmesg, player.states.photo)
     --add(dmesg, abs(player.dy))

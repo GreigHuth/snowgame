@@ -36,7 +36,7 @@ function check_los()
         local i_x = lerp(player.x, scan_rect.x, t)
         local i_y = lerp(player.y, scan_rect.y, t)
         
-        if fget(mget(i_x/8, i_y/8), 1) == true then
+        if fget(mget(i_x/8, i_y/8), flag.SOLID) == true then
             return false
         end
     end
@@ -50,14 +50,12 @@ end
 function scan_rect:lookup_spr()
     for i=self.x, self.x+scan_rect.w, 1 do
         for j=self.y, self.y+scan_rect.w, 1 do
-
             local s = mget(i/8, j/8)
-            if fget(s, 6) == true then
+            if fget(s, flag.SCANNABLE) == true and check_los() then
                 return s
             end
         end
     end
-
     return -1
 end
 
@@ -66,17 +64,12 @@ end
 --returns the index if there is a space and -1 otherwise
 function find_space(start, stop, text)
 
-
     while stop > start do
-
         if sub(text, stop, stop) ==  " " then 
             return stop
         end
-
         stop -= 1
-
     end
-    
     return -1
 end
 
@@ -112,26 +105,28 @@ function print_desc(spr)
 end
 
 
+
 holding = 0
 function scan_rect:draw()
-        
+    
+    if check_los == false then
+
+    end
+
     local x1 = player.anchor:add(player.orient, -1) --set eye positions
     local y =  player.anchor.y - 3
     
     line(x1, y, self.x+7, self.y+7, 8)
-    
     rect(self.x, self.y, self.x+self.w, self.y+self.w, 7)
-
 
 
     if stat(34) == 1 then
         
         local y = self.scanline.y+self.scanline.yoff
-        line(self.scanline.x, y, self.scanline.x+self.w, y, self.scanline.c)
+        line(self.scanline.x, y, self.scanline.x+self.w, y, self.scanline.c)--actual scanline
         self.scanline.yoff += 0.5
 
         player.s_target = self:lookup_spr()
-
         
         if player.s_target  != -1 then
             spr(103, self.x-2, self.y-8) --draw "!" if target is scannable

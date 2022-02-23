@@ -8,8 +8,7 @@ end
 
 --finds the euclidean distance between two points
 function e_dist(x, y, a, b)
-    local answer = sqrt((a-x)^2 + (b-y)^2)
-    return answer
+    return sqrt((a-x)^2 + (b-y)^2)
 end
 
 

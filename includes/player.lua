@@ -60,20 +60,19 @@ player = {
 
 
 
--- returns true if player has line of sight with scan target, false otherwise
-function los_detection()
-end
 --uncessesary for now
 function player:init()
     self.sprites.index = 1
     self.states.scanning = false
 end
 
+
 hb_offset = 2 --offsets hitbox from absolute player position
 function player:draw_hitbox()
     local hb_colour = 7
     rect(self.x+hb_offset, self.y, self.x+hb_offset+self.w, self.y+self.h, hb_colour)
 end
+
 
 --checks the 4 corners of the given box to see if ot overlaps with a block flagged as solid
 function hit_solid(x, y, w ,h)
@@ -82,7 +81,7 @@ function hit_solid(x, y, w ,h)
 
     for i=x, x+w, w do
         --if pixel is both part of a solid sprite and not black then
-        if fget(mget(i/8, y/8), 1) or fget(mget(i/8, (y+h)/8), 1) then
+        if fget(mget(i/8, y/8), 1) or fget(mget(i/8, (y+h)/8), flag.SOLID) then
             return true
         end
     end
@@ -96,7 +95,7 @@ function hit_head(x, y, w)
 
     for i=x, x+w, w do
         --if pixel is both part of a solid sprite and not black then
-        if fget(mget(i/8, y/8), 1) then
+        if fget(mget(i/8, y/8), flag.SOLID) then
             return true
         end
     end
@@ -123,7 +122,7 @@ function pp_collision(x, y, w, h)
     --this is innefficient af, program this the old way
     for i=x, x+w, 1 do
         for j=y, y+h, 1 do
-            if fget(mget(i/8, j/8), 1) then
+            if fget(mget(i/8, j/8), flag.SOLID) then
                 return true
             end
         
@@ -223,7 +222,7 @@ end
 function player:stair_bump()
     local x = self.anchor:add(self.orient, 2)
     local y = self.anchor.y
-    if pget(x, y) == 0 and ( pget(x, y+1) == 4 or pget(x, y+2) == 4) and abs(self.dx) > 0 and fget(mget(x/8, (y+1)/8), 1) then
+    if pget(x, y) == 0 and ( pget(x, y+1) == 4 or pget(x, y+2) == 4) and abs(self.dx) > 0 and fget(mget(x/8, (y+1)/8), flag.SOLID) then
         self.y -=1
         if not self.orient then
             self.x +=0.4
@@ -274,11 +273,9 @@ function player:move()
         end
     end
 
-
     self:stair_bump()
 
     --jumping
-    --WIP 
     if btnp(2) and self.states.jmp > 0 then 
         self.dy = -1
         self.states.jmp -= 1
@@ -291,9 +288,6 @@ function player:move()
         self.dy += gravity*0.5
         self.dy = mid(0, self.dy, self.max_dy)
     end
-    
-    
-    
 
     --do basic collision when jumping, cba coding the pp proberly
     if self.dy < 0 then 
@@ -311,8 +305,6 @@ function player:move()
         self.dx = 0
     end
     
-    
-
     --oob detection
     if (self.x + self.dx) < 0 then self.dx = 0 end 
 
@@ -328,7 +320,6 @@ function player:update()
     self.timers.animtimer = (self.timers.animtimer + 1)%self.animstep
 
     player:move()
-
 
     self.timers.timer += 1
     if self.timers.timer == 3 then
