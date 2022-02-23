@@ -30,9 +30,18 @@ scan_rect = {
 }
 
 --checks if there is line of site between player and target
-function scan_rect:check_los(startx, starty, endx, endy)
+function check_los()
 
-    return start
+    for t = 0, 1, 0.1 do 
+        local i_x = lerp(player.x, scan_rect.x, t)
+        local i_y = lerp(player.y, scan_rect.y, t)
+        
+        if fget(mget(i_x/8, i_y/8), 1) == true then
+            return false
+        end
+    end
+
+    return true
 
 end
 

@@ -96,6 +96,10 @@ function debug()
 
     dmesg = {} --need to reinitialise every frame
 
+    local los = check_los()
+
+    add(dmesg, los)
+
     --add(dmesg, player.states.photo)
     --add(dmesg, abs(player.dy))
     --add(dmesg, player.x..","..player.y)
