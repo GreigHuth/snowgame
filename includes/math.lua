@@ -36,3 +36,8 @@ function rotate_pixel(x, y, theta, basis_x, basis_y, b)
         return new_x, new_y
     end
 end
+
+--linear interpolation function, copied from wikipedia 
+function lerp(p0, p1, ratio)
+    return (1-ratio) * p0+ratio*p1
+end

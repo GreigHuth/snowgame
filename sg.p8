@@ -95,6 +95,7 @@ function debug()
     local c = get_camera_pos()
 
     dmesg = {} --need to reinitialise every frame
+
     --add(dmesg, player.states.photo)
     --add(dmesg, abs(player.dy))
     --add(dmesg, player.x..","..player.y)

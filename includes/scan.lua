@@ -18,7 +18,7 @@ collectables = {
 scan_rect = {
     x = 0,
     y = 0,
-    w = 16,
+    w = 10,
 
     scanline = { --scanline for scanning tool
         x = 0,
@@ -29,26 +29,18 @@ scan_rect = {
     },
 }
 
---struct to control printing stuff
-p_control = {
-    
-    spr = 0, --sprite we get the text from
-    pos = 0, --position in the string
-    
-    anim = {
-        s = 0, -- keep track of timing
-        t = 10 -- how often we update 
-    },
+--checks if there is line of site between player and target
+function scan_rect:check_los(startx, starty, endx, endy)
 
-    pline = 0
-    
-    
-}
+    return start
+
+end
 
 
-function scan_rect:scan()
-    for i=self.x, self.x+15, 1 do
-        for j=self.y, self.y+15, 1 do
+--looks up sprite number at scanning reticule
+function scan_rect:lookup_spr()
+    for i=self.x, self.x+scan_rect.w, 1 do
+        for j=self.y, self.y+scan_rect.w, 1 do
 
             local s = mget(i/8, j/8)
             if fget(s, 6) == true then
@@ -115,32 +107,29 @@ holding = 0
 function scan_rect:draw()
         
     local x1 = player.anchor:add(player.orient, -1) --set eye positions
-    local x2 = player.anchor:add(player.orient, 1)
     local y =  player.anchor.y - 3
     
-    line(x1, y, self.x, self.y+15, 10)
-    line(x2, y, self.x+15, self.y+15, 10)
-
+    line(x1, y, self.x+7, self.y+7, 8)
     
-    rect(self.x, self.y, self.x+15, self.y+15, 10)
+    rect(self.x, self.y, self.x+self.w, self.y+self.w, 7)
 
 
 
     if stat(34) == 1 then
         
         local y = self.scanline.y+self.scanline.yoff
-        line(self.scanline.x, y, self.scanline.x+15, y, self.scanline.c)
+        line(self.scanline.x, y, self.scanline.x+self.w, y, self.scanline.c)
         self.scanline.yoff += 0.5
 
-        player.s_target = self:scan()
+        player.s_target = self:lookup_spr()
 
         
         if player.s_target  != -1 then
-            spr(103, self.x, self.y-8) --draw "!" if target is scannable
+            spr(103, self.x-2, self.y-8) --draw "!" if target is scannable
             print_desc(player.s_target)
         end
 
-        if self.scanline.yoff == 15 then
+        if self.scanline.yoff == self.w then
                 self.scanline.yoff = 0 
         end
 
