@@ -40,3 +40,11 @@ end
 function lerp(p0, p1, ratio)
     return (1-ratio) * p0+ratio*p1
 end
+
+
+function normalize(x, y)
+    local l = sqrt( (x*x)+(y*y) ) 
+
+    return x / l, y / l
+
+end

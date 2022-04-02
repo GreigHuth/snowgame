@@ -41,6 +41,7 @@ player = {
         states = {
             jmp = 1,
             scanning = false, 
+            gun = false,
             dead = false
         },
 
@@ -71,65 +72,6 @@ hb_offset = 2 --offsets hitbox from absolute player position
 function player:draw_hitbox()
     local hb_colour = 7
     rect(self.x+hb_offset, self.y, self.x+hb_offset+self.w, self.y+self.h, hb_colour)
-end
-
-
---checks the 4 corners of the given box to see if ot overlaps with a block flagged as solid
-function hit_solid(x, y, w ,h)
-
-    x += hb_offset
-
-    for i=x, x+w, w do
-        --if pixel is both part of a solid sprite and not black then
-        if fget(mget(i/8, y/8), 1) or fget(mget(i/8, (y+h)/8), flag.SOLID) then
-            return true
-        end
-    end
-
-    return false
-end 
-
-function hit_head(x, y, w)
-
-    x += hb_offset
-
-    for i=x, x+w, w do
-        --if pixel is both part of a solid sprite and not black then
-        if fget(mget(i/8, y/8), flag.SOLID) then
-            return true
-        end
-    end
-
-    return false
-end 
-
---checks to see if the given box collides with any solid pixels
-function pp_collision(x, y, w, h)
-
-    y = flr(y)
-    x += hb_offset
-    local c = 0
-
-    --if the layer of blocks underneath the player is 
-    for i=x, x+w, 1 do
-        if pget(i, y+6) == 0 then
-            c+=1
-        end
-    end
-
-    if c == 4 then return false end
-
-    --this is innefficient af, program this the old way
-    for i=x, x+w, 1 do
-        for j=y, y+h, 1 do
-            if fget(mget(i/8, j/8), flag.SOLID) then
-                return true
-            end
-        
-        end
-    end
-
-    --printh(c)      
 end
 
 
@@ -215,9 +157,11 @@ function player:update_anchor()
     end
 end
 
+
 --reset player to last checkpoint
 function player:reset()
 end
+
 
 function player:stair_bump()
     local x = self.anchor:add(self.orient, 2)
@@ -235,14 +179,15 @@ end
 
 function player:move()
 
+    local p = 1
     --player cant move and has completely different actions when taking a photo
     if self.states.photo == true then return end
 
     if self.noclip then
-        if btn(0) then self.x -= 5
-        elseif btn(1) then self.x += 5
-        elseif btn(2) then self.y -= 5
-        elseif btn(3) then self.y += 5
+        if btn(0, p) then self.x -= 5
+        elseif btn(1, p) then self.x += 5
+        elseif btn(2, p) then self.y -= 5
+        elseif btn(3, p) then self.y += 5
         end
         return
     end
@@ -256,12 +201,12 @@ function player:move()
     end
 
     --moving left
-    if btn(0) then 
+    if btn(0, p) then 
         self.orient = true
         self.dx -= self.accel*accel_mod
         self.dx = mid(0, self.dx, -self.max_dx)
     --moving right
-    elseif btn(1) then 
+    elseif btn(1, p) then 
         self.orient = false
         self.dx += self.accel*accel_mod
         self.dx = mid(0, self.dx, self.max_dx) 
@@ -276,7 +221,7 @@ function player:move()
     self:stair_bump()
 
     --jumping
-    if btnp(2) and self.states.jmp > 0 then 
+    if btnp(2, p) and self.states.jmp > 0 then 
         self.dy = -1
         self.states.jmp -= 1
     end
@@ -319,7 +264,7 @@ function player:update()
 
     self.timers.animtimer = (self.timers.animtimer + 1)%self.animstep
 
-    player:move()
+    self:move()
 
     self.timers.timer += 1
     if self.timers.timer == 3 then
@@ -331,10 +276,22 @@ function player:update()
         end
     end
 
-    --toggle scan mode
-    if btnp(5) then
+
+    --the code that actually does the shooting and scanning is in gun.lua and scan.lua respectively
+    if btnp(5, 1) then --toggle gun mode
+
+        if self.states.gun == false then
+            self.states.scanning = false
+            self.states.gun = true
+        else
+            self.states.gun = false
+        end
+    end
+    
+    if btnp(4) then --toggle scan mode
         if self.states.scanning == false then
-            self.states.scanning= true
+            self.states.gun = false
+            self.states.scanning = true
         else
             self.states.scanning = false
         end

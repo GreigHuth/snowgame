@@ -19,6 +19,7 @@ scan_rect = {
     x = 0,
     y = 0,
     w = 10,
+    c = 5,
 
     scanline = { --scanline for scanning tool
         x = 0,
@@ -116,8 +117,11 @@ function scan_rect:draw()
     local x1 = player.anchor:add(player.orient, -1) --set eye positions
     local y =  player.anchor.y - 3
     
+    --draw line from player to cursor
     line(x1, y, self.x+7, self.y+7, 8)
-    rect(self.x, self.y, self.x+self.w, self.y+self.w, 7)
+    
+    --draw cursor
+    rect(self.x, self.y, self.x+self.w, self.y+self.w, self.c)
 
 
     if stat(34) == 1 then
