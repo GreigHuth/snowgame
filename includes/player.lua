@@ -114,8 +114,7 @@ function player:draw()
         --this block can probably be ripped out and encapsulated in its own function
         if self.states.jmp == 0 and self.spinjump == true then
             player:rotate()
-
-        elseif self.dy == 1 then
+        elseif self.dy > 0.5 then
             spr(19, self.x, self.y, 1, 1, self.orient)
         else 
             spr(18, self.x, self.y, 1, 1, self.orient)

@@ -42,9 +42,9 @@ function update_camera()
     end
 
     if player.y - camera_pos.y > 90 then 
-        camera_pos.y += 1
+        camera_pos.y += 1.25
     elseif player.y - camera_pos.y < 40 then 
-        camera_pos.y -= 1
+        camera_pos.y -= 1.25
     end
 
     if camera_pos.x < 0 then camera_pos.x = 0 end
