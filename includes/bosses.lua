@@ -1,12 +1,14 @@
 
 boss1 = {
-    x = 7*8, 
-    y = 9*8, 
+    x = 41* 8, 
+    y = 6* 8, 
     dy = 0,
     max_dy = 1,
     dx = 0,
     w = 16, --pixel width and height
     h = 16,
+    ft = 0,
+    orient = true, --true is right, false is left
     sprites = {
         normal = {13, 14, 29, 30},
         enrage = {11, 12, 27, 28}
@@ -25,18 +27,36 @@ boss1 = {
         end
     end,
 
+    move = function(self)
+    end,
+    
     update = function(self)
 
-        self.dy += mid(0, self.dy+gravity, self.max_dy)
+        self.dy += mid(0, self.dy+gravity, self.max_dy) --apply gravity
 
+        --do collision        
         if hit_solid(self.x, self.y+self.dy, 15, 15) == true then
             self.dy = 0
         end
 
-        self.y += self.dy
-
-        
-            
+        --update position
+        self.y += self.dy   
     end
+
+
+}
+
+
+target = {
+    x=4*8,
+    y=6*8,
+    sprite = 9,
+    ft = 0, --frame timer
+    draw = function(self)
+        spr(self.sprite, self.x, self.y)
+    end, 
+    update = function(self)
+        ft = ft+1%stat(8)  
+    end 
 
 }

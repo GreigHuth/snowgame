@@ -12,15 +12,21 @@ function e_dist(x, y, a, b)
 end
 
 
+--translates a vector in terms of another vector, default basis is 0,0
+function change_basis(xb, yb, x, y)
+    x = x - xb --x translated
+    y = y - yb
+    return x, y
+end
+
 --rotate pixel around given basis
-function rotate_pixel(x, y, theta, basis_x, basis_y, b)
+function rotate_pixel(x, y, theta, xb, yb, b)
 
     if not b then b = false end
     if not basis_x then basis_x = 0 end
     if not basis_y then basis_y = 0 end
 
-    x = x - basis_x --x translated
-    y = y - basis_y
+    change_basis(xb, yb, x, y)
 
     local d = 360
     local a = 1
@@ -42,9 +48,9 @@ function lerp(p0, p1, ratio)
 end
 
 
+--normalizes the given vector
 function normalize(x, y)
     local l = sqrt( (x*x)+(y*y) ) 
-
     return x / l, y / l
 
 end

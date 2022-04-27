@@ -8,24 +8,21 @@ function draw_rotate(x, y, w, h, column, row, theta)
 
 
     for i=0, w, 1 do
-        for j = 0, h, 1 do
+        for j=0 , h, 1 do
 
             --get colour
             local c = sget(column+i, row+j)
 
-            --ignore blacks
+            --ignore black pixels
             if c != 0 then
                 
                 local new_x,new_y= rotate_pixel(x+i, y+j, theta, xb, yb, false)
-                printh("new:"..new_x..","..new_y)
 
                 --draw new colours
                 pset(new_x, new_y, c)
             end
         end
     end
-
-    printh("next")
 end
 
 testing = {
@@ -89,6 +86,20 @@ function snow_init(xpos, ypos)
     
 end
 
+
+function snow_setup()
+    snow_init(10, -2)
+    snow_init(30, -1)
+    snow_init(42, -5)
+    snow_init(55, 0)
+    snow_init(90, -10)
+    
+    snow_init(10, -30)
+    snow_init(30, -20)
+    snow_init(42, -60)
+    snow_init(55, -40)
+    snow_init(90, -70)
+end
 
 function draw_snow()
     for snow in all(snow_class) do

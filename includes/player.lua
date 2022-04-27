@@ -27,8 +27,7 @@ player = {
 
         noclip = false,
 
-        orient = false, --true means facing left, false means facing right
-                        --this seems strange but it simplifies sprite drawing code    
+        orient = false, --true means facing left, false means facing right, helps simplify sprite drawing script
         animstep = 5,
         
         timers = {
@@ -41,8 +40,9 @@ player = {
         states = {
             jmp = 1,
             scanning = false, 
-            gun = false,
-            dead = false
+            gun = true, --start with gun
+            dead = false,
+            crouching = false
         },
 
         --anchor point to ensure symmetry when drawing additonal things to player, like eye rays for the photo
@@ -61,15 +61,15 @@ player = {
 
 
 
---uncessesary for now
 function player:init()
     self.sprites.index = 1
     self.states.scanning = false
 end
 
 
-hb_offset = 2 --offsets hitbox from absolute player position
+
 function player:draw_hitbox()
+    local hb_offset = 2 --offsets hitbox from absolute player position
     local hb_colour = 7
     rect(self.x+hb_offset, self.y, self.x+hb_offset+self.w, self.y+self.h, hb_colour)
 end
@@ -108,6 +108,7 @@ function player:rotate()
 end
 
 function player:draw()
+
     --this block controls drawing jumping sprites
     if self.dy != 0 then 
         
@@ -133,19 +134,22 @@ function player:draw()
             end
         end
         
-    elseif btn(3) then --crouching
-        spr(17,self.x, self.y, 1, 1, self.orient)
 
+    elseif btn(3, 1) then --crouching
+        spr(17,self.x, self.y, 1, 1, self.orient)
     else --reset running animation
         self.sprites.index = 1
         spr(self.sprites.idle ,self.x, self.y, 1, 1, self.orient)
     end
 
 
+   
+
+
 end
 
 
---update anchor point
+--update anchor point, for drawing things on the player
 function player:update_anchor()
     if self.orient then
         self.anchor.x = self.x + 3
@@ -165,9 +169,13 @@ end
 function player:stair_bump()
     local x = self.anchor:add(self.orient, 2)
     local y = self.anchor.y
+
+    --work out if were trying to walk up stairs or not, stairs are diagonal lines with the colour 4, see sprites 101, 117
+    --MAGIC NUMBERS BAD
     if pget(x, y) == 0 and ( pget(x, y+1) == 4 or pget(x, y+2) == 4) and abs(self.dx) > 0 and fget(mget(x/8, (y+1)/8), flag.SOLID) then
         self.y -=1
-        if not self.orient then
+
+        if not self.orient then--depending on which way your facing, bump the player in that direction
             self.x +=0.4
         else
             self.x-=0.4
@@ -178,10 +186,10 @@ end
 
 function player:move()
 
-    local p = 1
-    --player cant move and has completely different actions when taking a photo
-    if self.states.photo == true then return end
+    local p = 1 --player
 
+
+    --godmode
     if self.noclip then
         if btn(0, p) then self.x -= 5
         elseif btn(1, p) then self.x += 5
@@ -191,11 +199,14 @@ function player:move()
         return
     end
 
+    --anchor is so the scanning line knows where to attach itself to the player
     self:update_anchor()
 
-    --cannot add horizontal movement when in the air
-    accel_mod = 1
-    if self.states.jmp < self.jmp_max then
+
+    
+    accel_mod = 1 --acceleration modifier 
+
+    if self.states.jmp < self.jmp_max then --dont allow player to add horizontal speed in the air
         accel_mod = 0.25
     end
 
@@ -204,11 +215,13 @@ function player:move()
         self.orient = true
         self.dx -= self.accel*accel_mod
         self.dx = mid(0, self.dx, -self.max_dx)
+
     --moving right
     elseif btn(1, p) then 
         self.orient = false
         self.dx += self.accel*accel_mod
         self.dx = mid(0, self.dx, self.max_dx) 
+
     --handles decceleration 
     else
         self.dx = self.dx * 0.8
@@ -217,15 +230,17 @@ function player:move()
         end
     end
 
+    --allows player to climb up stairs
     self:stair_bump()
 
     --jumping
-    if btnp(2, p) and self.states.jmp > 0 then 
-        self.dy = -1
+    if btnp(2, p) and self.states.jmp > 0 then
+        local jmp_strength = 1.25
+        self.dy = -jmp_strength
         self.states.jmp -= 1
     end
 
-    --gravity is weak on the way up and strong on the way down
+    --gravity is weak on the way up and stronger on the way down
     if self.dy < 0 then 
         self.dy += (gravity*0.25)
     else
@@ -233,11 +248,13 @@ function player:move()
         self.dy = mid(0, self.dy, self.max_dy)
     end
 
-    --do basic collision when jumping, cba coding the pp proberly
+    --check head collision while jumping so you dont get stuck
     if self.dy < 0 then 
         if hit_head(self.x, self.y+self.dy, self.w) then
             self.dy = 0--if yes then dont let them update 
         end
+     
+    --NOT OPTIMISED
     --floor collision
     elseif pp_collision(self.x, self.y+self.dy, self.w, self.h) then
         self.dy = 0--if yes then dont let them update 
@@ -252,7 +269,7 @@ function player:move()
     --oob detection
     if (self.x + self.dx) < 0 then self.dx = 0 end 
 
-    --update player position
+    --finally, update player position after youve worked out if its making a "legal" move
     self.x += self.dx
     self.y += self.dy
        
@@ -261,38 +278,31 @@ end
 
 function player:update()
 
+    --update frame timer
     self.timers.animtimer = (self.timers.animtimer + 1)%self.animstep
 
     self:move()
 
-    self.timers.timer += 1
-    if self.timers.timer == 3 then
-        self.timers.timer = 0
-        self.timers.a_timer += 90
+    -- this code is for doing the spinning animation, not needed right now
+    --self.timers.timer += 1
+    --if self.timers.timer == 3 then
+    --    self.timers.timer = 0
+    --    self.timers.a_timer += 90
 
-        if self.timers.a_timer == 360 then 
-            self.timers.a_timer = 0
-        end
-    end
+    --    if self.timers.a_timer == 360 then 
+    --        self.timers.a_timer = 0
+    --    end
+    --end
 
 
     --the code that actually does the shooting and scanning is in gun.lua and scan.lua respectively
-    if btnp(5, 1) then --toggle gun mode
-
-        if self.states.gun == false then
-            self.states.scanning = false
-            self.states.gun = true
-        else
-            self.states.gun = false
-        end
-    end
     
-    if btnp(4) then --toggle scan mode
-        if self.states.scanning == false then
+    if btnp(4) and self.states.scanning == false then --toggle scan mode
             self.states.gun = false
             self.states.scanning = true
-        else
+    elseif btnp(4) and self.states.scanning == true then
             self.states.scanning = false
-        end
+            self.states.gun = true
     end
+    
 end

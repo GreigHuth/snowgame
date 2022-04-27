@@ -2,46 +2,91 @@
 
 --track all the bullets on screen
 
-
-gun={
-    x = 0,
-    y = 0
-}
 --bullet management system lel
---x, y, radius, colour, dx, dy
-bms = {
-    max_bullets = 10,
-}
+--x, y, radius, dx, dy, t
+max_bullets = 10
+bullet_colour = 11
 
 bullets = {
 }
 
+
+
+
+
+--checks to see if the coordinate is on screen or not
+function on_screen(x, y)
+    if x < camera_pos.x or x > camera_pos.x+128 then
+        return false
+    elseif y < camera_pos.y or y > camera_pos.y+128 then
+        return false
+    else
+        return true
+    end
+end
+
+
 function bullet_draw(bullet)
-    circ(bullet[1],bullet[2], bullet[3], 6)
+
+    local deleted = bullet_del(bullet) --before we draw check to see if bullet needs to be deleted
+    if deleted == true then
+        return
+    end
+    local mul = 2 --bullet speed multiplier
+    bullet[1] += bullet[4] * mul-- bullet[4]
+    bullet[2] += bullet[5] * mul
+    circ(bullet[1],bullet[2], bullet[3], bullet_colour)
+end
+
+
+function bullet_del(bullet)
+    if on_screen(bullet[1], bullet[2]) then
+        return false
+    else
+        del(bullets,bullet)
+        return true
+    end
 end
 
 --draw bullet
-function bms:draw()
+function bms_draw()
+
     foreach(bullets, bullet_draw)
+
+    --draw cursor
     local cursor_x = stat(32)+camera_pos.x
     local cursor_y = stat(33)+camera_pos.y
     rect(cursor_x, cursor_y, cursor_x+2, cursor_y+2, 7)
 end
 
 
-function bms:update()
-
+function bms_update()
     if stat(34) == 1 then
         add_bullet()
     end
-
     rect(60, 60, 3, 3, 6)
+
+
 end
 
---NEEDS OPTIMISED SEE SCAN.LUA LINE 151
+
 function add_bullet()
+
+    if #bullets > max_bullets then
+        return
+    end
+
     local cursor_x = stat(32)+camera_pos.x
     local cursor_y = stat(33)+camera_pos.y
-    local bullet = {cursor_x, cursor_y, 1}
+
+    cx, cy = change_basis(player.x, player.y, cursor_x, cursor_y)
+    local dx, dy = normalize(cx, cy)
+
+    printh("dx, dy:"..dx..","..dy)
+    local bullet = {player.x+2, player.y, 0.5, dx, dy}
     add(bullets, bullet)
 end
+
+
+
+

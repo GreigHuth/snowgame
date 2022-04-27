@@ -2,7 +2,7 @@
 
 --checks the 4 corners of the given box to see if ot overlaps with a block flagged as solid
 function hit_solid(x, y, w ,h)
-
+    local hb_offset = 2 --offsets hitbox from absolute player position
     x += hb_offset
 
     for i=x, x+w, w do
@@ -17,7 +17,7 @@ end
 
 
 function hit_head(x, y, w)
-
+    local hb_offset = 2 --offsets hitbox from absolute player position
     x += hb_offset
 
     for i=x, x+w, w do
@@ -33,7 +33,7 @@ end
 
 --checks to see if the given box collides with any solid pixels
 function pp_collision(x, y, w, h)
-
+    local hb_offset = 2 --offsets hitbox from absolute player position
     y = flr(y)
     x += hb_offset
     local c = 0

@@ -52,8 +52,11 @@ function scan_rect:lookup_spr()
     for i=self.x, self.x+scan_rect.w, 1 do
         for j=self.y, self.y+scan_rect.w, 1 do
             local s = mget(i/8, j/8)
-            if fget(s, flag.SCANNABLE) == true and check_los() then
-                return s
+            if fget(s, flag.SCANNABLE) == true then
+                if check_los() then
+                    return s
+                else 
+                end
             end
         end
     end
@@ -90,26 +93,30 @@ function print_desc(spr)
 
     --draw outline
     
+    --draw text box
     rectfill(camera_pos.x+xoff, camera_pos.y+yoff, camera_pos.x+xoff+(31*4)+2, camera_pos.y+yoff+((6*3)+3), 0)
     rect(camera_pos.x+xoff, camera_pos.y+yoff, camera_pos.x+xoff+(31*4)+2, camera_pos.y+yoff+(6*3)+3, 8)
 
+    --work out where the line breaks are
     last_space = find_space(0, 31, text)
     last_space2 = find_space(32, 60, text)
 
+    --calculate offsets for text
     local x = camera_pos.x+xoff+2
     local y = camera_pos.y+yoff+2
 
+    --display text
     print(sub(text, 0, last_space), x, y, 7)
     print(sub(text, last_space+1, last_space2), x, y+6, 7)
-    --print(sub(text, last_space2+1, 80), x, y+12, 7)
+    print(sub(text, last_space2+1, 80), x, y+12, 7)
 
 end
 
 
 
-holding = 0
+
 function scan_rect:draw()
-    
+    local holding = 0
     if check_los == false then
 
     end
