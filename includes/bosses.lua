@@ -1,9 +1,9 @@
 
 boss1 = {
-    x = 41* 8, 
+    x = 8* 8, 
     y = 6* 8, 
     dy = 0,
-    max_dy = 1,
+    max_dy = 5,
     dx = 0,
     w = 16, --pixel width and height
     h = 16,
@@ -15,7 +15,8 @@ boss1 = {
     },
 
     states = {
-        enrage = false 
+        enrage = false,
+        in_air = true,
     },
 
     draw =  function(self)
@@ -27,20 +28,34 @@ boss1 = {
         end
     end,
 
-    move = function(self)
-    end,
     
     update = function(self)
 
-        self.dy += mid(0, self.dy+gravity, self.max_dy) --apply gravity
+        self.ft = (self.ft + 1)%stat(8)
+ 
+        
 
+        if (30 < self.ft) and (self.ft < 40) and self.in_air == false then
+            self.dy = -1
+            self.in_air = true
+        end
+
+        g_modifier = 0.25
+        --apply gravity
+        self.dy += gravity*g_modifier
+
+        if self.dy >= 0 then 
+            self.dy = mid(0, self.dy, self.max_dy)--only clamp speed on the way down
+        end
         --do collision        
         if hit_solid(self.x, self.y+self.dy, 15, 15) == true then
             self.dy = 0
+            self.in_air = false
         end
 
         --update position
         self.y += self.dy   
+        self.x += self.dx
     end
 
 

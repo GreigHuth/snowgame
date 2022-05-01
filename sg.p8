@@ -1,5 +1,5 @@
 pico-8 cartridge // http://www.pico-8.com
-version 33
+version 34
 __lua__
 --Made By Gurg
 -- i want it to be made clear that i never said i was actually good at programming
@@ -45,7 +45,7 @@ function _init()
     
     --globals
     game_over = false
-    debug_on = false
+    debug_on = true
     grid_x = 0
     grid_y = 0 --current grid position
     map_tile = 0
@@ -91,9 +91,7 @@ function debug()
  
     dmesg = {} --need to reinitialise every frame
 
-    add(dmesg, player.states.gun)
-    add(dmesg, player.states.scanning)
-    add(dmesg, #bullets)
+    add(dmesg, boss1.ft)
     --add(dmesg, player.states.photo)
     --add(dmesg, abs(player.dy))
     --add(dmesg, player.x..","..player.y)

@@ -2,7 +2,7 @@
 
 player = {
         x = 5*8,
-        y = 12*8,
+        y = 14*8,
         w = 3,
         h = 5,
 
@@ -184,32 +184,13 @@ function player:stair_bump()
 end
 
 
-function player:move()
+--the following two functions handle x and y movement respectively
+
+
+function player:handle_x_movement()
 
     local p = 1 --player
-
-
-    --godmode
-    if self.noclip then
-        if btn(0, p) then self.x -= 5
-        elseif btn(1, p) then self.x += 5
-        elseif btn(2, p) then self.y -= 5
-        elseif btn(3, p) then self.y += 5
-        end
-        return
-    end
-
-    --anchor is so the scanning line knows where to attach itself to the player
-    self:update_anchor()
-
-
     
-    accel_mod = 1 --acceleration modifier 
-
-    if self.states.jmp < self.jmp_max then --dont allow player to add horizontal speed in the air
-        accel_mod = 0.25
-    end
-
     --moving left
     if btn(0, p) then 
         self.orient = true
@@ -229,9 +210,12 @@ function player:move()
             self.dx = 0 
         end
     end
+end
 
-    --allows player to climb up stairs
-    self:stair_bump()
+--as well as player input, this function also applies gravity to the player
+function player:handle_y_movement()
+    
+    local p = 1 --player
 
     --jumping
     if btnp(2, p) and self.states.jmp > 0 then
@@ -247,7 +231,11 @@ function player:move()
         self.dy += gravity*0.5
         self.dy = mid(0, self.dy, self.max_dy)
     end
+end
 
+
+function player:handle_collision()
+    
     --check head collision while jumping so you dont get stuck
     if self.dy < 0 then 
         if hit_head(self.x, self.y+self.dy, self.w) then
@@ -268,6 +256,44 @@ function player:move()
     
     --oob detection
     if (self.x + self.dx) < 0 then self.dx = 0 end 
+
+end
+
+
+function player:move()
+
+    local p = 1 --player
+
+    --godmode
+    if self.noclip then
+        if btn(0, p) then self.x -= 5
+        elseif btn(1, p) then self.x += 5
+        elseif btn(2, p) then self.y -= 5
+        elseif btn(3, p) then self.y += 5
+        end
+        return
+    end
+
+    --anchor is so the scanning line knows where to attach itself to the player
+    self:update_anchor()
+
+    
+    accel_mod = 1 --acceleration modifier 
+
+    if self.states.jmp < self.jmp_max then --dont allow player to add horizontal speed in the air
+        accel_mod = 0.25
+    end
+
+    self:handle_x_movement()
+
+    --allows player to climb up stairs
+    self:stair_bump()
+
+    self:handle_y_movement()  
+
+    --collision comes at the end to check the move the player wants to make is  a legal move
+    self:handle_collision()
+
 
     --finally, update player position after youve worked out if its making a "legal" move
     self.x += self.dx
