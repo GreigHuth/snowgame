@@ -30,24 +30,24 @@ function hit_head(x, y, w)
     return false
 end 
 
-
---checks to see if the given box collides with any solid pixels
+--NEEDS FIXING, CAN CLIP THROUGH BLOCKS
 function pp_collision(x, y, w, h)
+
     local hb_offset = 2 --offsets hitbox from absolute player position
-    y = flr(y)
-    x += hb_offset
+    local y = flr(y)
+    local x += hb_offset
     local c = 0
 
-    --if the layer of blocks underneath the player is 
+    --if the layer of blocks underneath the player is black then let them pass through
     for i=x, x+w, 1 do
-        if pget(i, y+6) == 0 then
+        if pget(i, y+h+1) == 0 then
             c+=1
         end
+        if c == 4 then return false end
     end
 
-    if c == 4 then return false end
+    
 
-    --this is innefficient af, program this the old way
     for i=x, x+w, 1 do
         for j=y, y+h, 1 do
             if fget(mget(i/8, j/8), flag.SOLID) then

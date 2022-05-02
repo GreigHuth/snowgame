@@ -1,21 +1,31 @@
 --Made By Gurg
 
 player = {
+        
+        --position
         x = 5*8,
         y = 14*8,
+
+        --width and height
         w = 3,
         h = 5,
 
+        --velocity
         dx = 0,
         dy = 0,
 
         max_dx = 0.75,
         max_dy = 2,
 
-        accel = 0.03,
+        accel = 0.03, --acceleration in pixels per frame, i playtested and found this to be best
 
-        s_target = 0, --just a debugging thing
+        --number of frames of airtime
+        airtime = 0, 
+        
+        --scan target
+        s_target = 0, 
 
+        --spr numbers for all necessary sprites
         sprites = {
             idle = 1,
             index = 1,
@@ -23,12 +33,17 @@ player = {
             doublej = 14,           
         },
 
+
+        --enable spinjump
         spinjump = false, 
 
         noclip = false,
 
-        orient = false, --true means facing left, false means facing right, helps simplify sprite drawing script
-        animstep = 5,
+        --true means facing left, false means facing right, helps simplify sprite drawing script
+        orient = false,
+
+
+        
         
         timers = {
             timer = 0,  --these need to be all merged or managed together in some way
@@ -38,7 +53,7 @@ player = {
         
         jmp_max = 1,
         states = {
-            jmp = 1,
+            in_air = true,
             scanning = false, 
             gun = true, --start with gun
             dead = false,
@@ -55,7 +70,8 @@ player = {
                 else return self.x + a
                 end
             end
-        },
+        }
+        
       
 }
 
@@ -64,6 +80,7 @@ player = {
 function player:init()
     self.sprites.index = 1
     self.states.scanning = false
+    self.input = false
 end
 
 
@@ -142,12 +159,7 @@ function player:draw()
         spr(self.sprites.idle ,self.x, self.y, 1, 1, self.orient)
     end
 
-
-   
-
-
 end
-
 
 --update anchor point, for drawing things on the player
 function player:update_anchor()
@@ -185,9 +197,13 @@ end
 
 
 --the following two functions handle x and y movement respectively
-
-
 function player:handle_x_movement()
+
+    local accel_mod = 1
+
+    if self.states.in_air then --dont allow player to add horizontal speed in the air
+        accel_mod = 0.25
+    end
 
     local p = 1 --player
     
@@ -217,14 +233,22 @@ function player:handle_y_movement()
     
     local p = 1 --player
 
-    --jumping
-    if btnp(2, p) and self.states.jmp > 0 then
-        local jmp_strength = 1.25
-        self.dy = -jmp_strength
-        self.states.jmp -= 1
+    --do jump
+    if btn(2, p) and player.states.in_air == false then
+
+
+            local max_airtime = 60
+            if self.airtime < max_airtime then 
+                player.airtime += 1  
+                player.dy = -0.75 * (1-(player.airtime/max_airtime))
+            else
+                player.states.in_air = true
+                player.dy = 0
+            end
+        
     end
 
-    --gravity is weak on the way up and stronger on the way down
+    --APPLY GRAVITY
     if self.dy < 0 then 
         self.dy += (gravity*0.25)
     else
@@ -237,7 +261,7 @@ end
 function player:handle_collision()
     
     --check head collision while jumping so you dont get stuck
-    if self.dy < 0 then 
+    if self.dy <= 0 then 
         if hit_head(self.x, self.y+self.dy, self.w) then
             self.dy = 0--if yes then dont let them update 
         end
@@ -246,7 +270,10 @@ function player:handle_collision()
     --floor collision
     elseif pp_collision(self.x, self.y+self.dy, self.w, self.h) then
         self.dy = 0--if yes then dont let them update 
-        self.states.jmp = self.jmp_max
+        
+        --reset jump stuff
+        self.states.in_air = false
+        self.airtime = 0 
     end
 
     --wall collision
@@ -260,7 +287,7 @@ function player:handle_collision()
 end
 
 
-function player:move()
+function player:handle_input()
 
     local p = 1 --player
 
@@ -274,22 +301,10 @@ function player:move()
         return
     end
 
-    --anchor is so the scanning line knows where to attach itself to the player
-    self:update_anchor()
-
-    
-    accel_mod = 1 --acceleration modifier 
-
-    if self.states.jmp < self.jmp_max then --dont allow player to add horizontal speed in the air
-        accel_mod = 0.25
-    end
-
     self:handle_x_movement()
-
-    --allows player to climb up stairs
-    self:stair_bump()
-
     self:handle_y_movement()  
+
+    self:stair_bump()
 
     --collision comes at the end to check the move the player wants to make is  a legal move
     self:handle_collision()
@@ -304,10 +319,19 @@ end
 
 function player:update()
 
-    --update frame timer
-    self.timers.animtimer = (self.timers.animtimer + 1)%self.animstep
+    animstep = 5--how often to tick over to next frame of animation, used when drawing run cycle
 
-    self:move()
+    --update frame timer
+    self.timers.animtimer = (self.timers.animtimer + 1)%animstep
+
+
+    if stat(30) then
+        self:handle_input()
+    end
+
+    --anchor is so the scanning line knows where to attach itself to the player
+    self:update_anchor()
+
 
     -- this code is for doing the spinning animation, not needed right now
     --self.timers.timer += 1

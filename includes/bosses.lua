@@ -19,6 +19,12 @@ boss1 = {
         in_air = true,
     },
 
+    draw_hitbox = function(self)
+        local hb_offset =0 --offsets hitbox from absolute player position
+        local hb_colour = 7
+        rect(self.x+hb_offset, self.y, self.x+hb_offset+self.w, self.y+self.h, hb_colour)
+    end,
+
     draw =  function(self)
         if not enrage then 
             spr(self.sprites.normal[1], self.x, self.y)

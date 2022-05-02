@@ -157,7 +157,6 @@ end
 
 --update position of scan reticule, regardless if its on screen or not
 function scan_rect:update()
-    poke(0x5f2d, 1)
     local mouse_x = stat(32)
     local mouse_y = stat(33)
 
