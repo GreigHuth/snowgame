@@ -1,0 +1,16 @@
+{
+    "Lua.diagnostics.globals": [
+        "player",
+        "tile_height",
+        "hit_tile",
+        "get_cell",
+        "slope_collision",
+        "TILE_FLAG",
+        "gravity",
+        "heightmap",
+        "mget"
+    ],
+    "Lua.diagnostics.disable": [
+        "lowercase-global"
+    ]
+}

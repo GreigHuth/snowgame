@@ -52,7 +52,7 @@ function scan_rect:lookup_spr()
     for i=self.x, self.x+scan_rect.w, 1 do
         for j=self.y, self.y+scan_rect.w, 1 do
             local s = mget(i/8, j/8)
-            if fget(s, flag.SCANNABLE) == true then
+            if fget(s, TILE_FLAG.SCANNABLE) == true then
                 if check_los() then
                     return s
                 else 

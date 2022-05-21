@@ -1,9 +1,6 @@
 --code do to tha shooty bangs
-
 --track all the bullets on screen
 
---bullet management system lel
---x, y, radius, dx, dy, t
 max_bullets = 10
 bullet_colour = 11
 
@@ -33,7 +30,9 @@ function bullet_draw(bullet)
         return
     end
     local mul = 2 --bullet speed multiplier
-    bullet[1] += bullet[4] * mul-- bullet[4]
+
+    --update bullet positions according to thier velocity
+    bullet[1] += bullet[4] * mul
     bullet[2] += bullet[5] * mul
     circ(bullet[1],bullet[2], bullet[3], bullet_colour)
 end
@@ -56,7 +55,7 @@ function bms_draw()
     --draw cursor
     local cursor_x = stat(32)+camera_pos.x
     local cursor_y = stat(33)+camera_pos.y
-    rect(cursor_x, cursor_y, cursor_x+2, cursor_y+2, 7)
+    circ(cursor_x, cursor_y, 0, 7)
 end
 
 
@@ -80,10 +79,15 @@ function add_bullet()
     local cursor_y = stat(33)+camera_pos.y
 
     cx, cy = change_basis(player.x, player.y, cursor_x, cursor_y)
+
     local dx, dy = normalize(cx, cy)
 
     printh("dx, dy:"..dx..","..dy)
-    local bullet = {player.x+2, player.y, 0.5, dx, dy}
+
+
+    local v = 1.5
+    --x, y, radius, dx, dy, t
+    local bullet = {player.x+2, player.y, 0.5, dx*v, dy*v}
     add(bullets, bullet)
 end
 

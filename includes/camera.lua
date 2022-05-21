@@ -3,15 +3,10 @@ camera_pos = {
     y = 0
 }
 
+
+--returns camx, camy
 function get_camera_pos()
-
-    local camera_pos = {} 
-    camera_pos[0] = peek2(0x5f28) -- x 
-    camera_pos[1] = peek2(0x5f2a) -- y 
-    return camera_pos
-end
-
-function camera_init()
+    return peek2(0x5f28), peek2(0x5f2a)
 end
 
 

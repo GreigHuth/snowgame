@@ -1,7 +1,9 @@
+--a lot of this is copied from player.lua
+
 
 boss1 = {
-    x = 8* 8, 
-    y = 6* 8, 
+    x = 8*8, 
+    y = 6*8, 
     dy = 0,
     max_dy = 5,
     dx = 0,
@@ -38,8 +40,6 @@ boss1 = {
     update = function(self)
 
         self.ft = (self.ft + 1)%stat(8)
- 
-        
 
         if (30 < self.ft) and (self.ft < 40) and self.in_air == false then
             self.dy = -1
@@ -53,6 +53,7 @@ boss1 = {
         if self.dy >= 0 then 
             self.dy = mid(0, self.dy, self.max_dy)--only clamp speed on the way down
         end
+
         --do collision        
         if hit_solid(self.x, self.y+self.dy, 15, 15) == true then
             self.dy = 0
