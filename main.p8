@@ -5,7 +5,6 @@ __lua__
 -- i want it to be made clear that i never said i was actually good at programming
 
 
-
 --GLOBAL TABLES
 TILE_FLAG = {
     FOREGROUND = 0,
@@ -55,6 +54,7 @@ actors_u = {} --list of actors to only be updated
 #include includes/camera.lua
 #include includes/bosses.lua
 
+#include includes/objects.lua
 #include includes/scan.lua
 #include includes/gun.lua
 #include includes/effects.lua
@@ -100,8 +100,10 @@ function _init()
     add(actors_d, player) -- player is always drawn so set that first #
     add(actors_u, player)
     
-    add(actors_d, boss1)
+    --add(actors_d, boss1)
     --add(actors_u, boss1)
+
+    add_meteor(11, 9)
     
     add(actors_u, scan_rect)
 end
@@ -153,6 +155,8 @@ function _draw()
     foreach(actors_d, function(obj) obj:draw() end)--draw actors
 
     map(0,0, 0,0, celwh,celwh, 1) --draws foreground objects
+
+    draw_all_meteors()
    
     if player.states.scanning == true then 
         scan_rect:draw()

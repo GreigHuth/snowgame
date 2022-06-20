@@ -1,31 +1,15 @@
---code do to tha shooty bangs
+--
 --track all the bullets on screen
 
 max_bullets = 10
 bullet_colour = 11
 
-bullets = {
-}
-
-
-
-
-
---checks to see if the coordinate is on screen or not
-function on_screen(x, y)
-    if x < camera_pos.x or x > camera_pos.x+128 then
-        return false
-    elseif y < camera_pos.y or y > camera_pos.y+128 then
-        return false
-    else
-        return true
-    end
-end
-
+bullets = {}
 
 function bullet_draw(bullet)
 
-    local deleted = bullet_del(bullet) --before we draw check to see if bullet needs to be deleted
+    --before we draw it, check if it needs to be deleted
+    local deleted = bullet_del(bullet) 
     if deleted == true then
         return
     end
@@ -46,6 +30,7 @@ function bullet_del(bullet)
         return true
     end
 end
+
 
 --draw bullet
 function bms_draw()

@@ -1,7 +1,6 @@
 --Made By Gurg
 
 player = {
-
         --position
         x = 11*8,
         y = 14*8,
@@ -91,7 +90,6 @@ function player:init()
 end
 
 
-
 function player:draw_hitbox()
     local hb_offset = 2 --offsets hitbox from absolute player position
     local hb_colour = 7
@@ -101,17 +99,14 @@ end
 
 --returns true if the player is standing on a sprite with flag
 function player:standing_on(flag)
-
     local x = self.x +self.hb_offset
     local y = self.y + self.h+1
     for i=x, x+self.w, 1 do
-        if fget(mget(i/8, y/8), flag) then
-            return true
-        end
-
+        if fget(mget(i/8, y/8), flag) then return true end
     end
     return false
 end
+
 
 function player:rotate()
     --DOES THE FANCY SPRITE ROTATIONS
@@ -177,6 +172,7 @@ function player:draw()
 
 end
 
+
 --update anchor point, for drawing things on the player
 function player:update_anchor()
     if self.orient then
@@ -195,20 +191,14 @@ end
 
 
 function player:drawHUD()
-
     --draw airtime meter
     local camx, camy = get_camera_pos()
-
-
     local gauge_l = 20
     local airtime_left = 1 - (self.airtime/self.max_airtime)
     color(10)
     rectfill(camx+100, camy+10, camx+100+(gauge_l*airtime_left), camy+15)
     color(7)
     rect(camx+100, camy+10, camx+100+gauge_l, camy+15)
-
-
-
 end
 
 
@@ -267,7 +257,6 @@ function player:handle_input()
 
     --apply gravity
     self.dy += gravity
-
 
     --check basic collision
     if hit_tile(TILE_FLAG.SOLID, self.x+self.dx+self.hb_xoff, self.y, self.w, self.h) then
@@ -339,7 +328,6 @@ function player:update()
     --        self.timers.a_timer = 0
     --    end
     --end
-
 
     --the code that actually does the shooting and scanning is in gun.lua and scan.lua respectively
 

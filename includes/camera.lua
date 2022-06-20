@@ -32,8 +32,13 @@ function update_camera()
     camera(camera_pos.x, camera_pos.y)
 end
 
---checks to see if given object is on screen or not
---TODO
-function on_screen(object)
-    
+--checks to see if the coordinate is on screen or not
+function on_screen(x, y)
+    if x < camera_pos.x or x > camera_pos.x+128 then
+        return false
+    elseif y < camera_pos.y or y > camera_pos.y+128 then
+        return false
+    else
+        return true
+    end
 end
